@@ -1,0 +1,29 @@
+# Internal reverse proxy (production).
+#
+# TLS is terminated by Cloudflare and traffic reaches this container over the
+# Cloudflare Tunnel (cloudflared), so Caddy does NOT manage certificates or
+# expose any public ports — it only does single-origin path routing on :80.
+{
+	auto_https off
+	admin off
+}
+
+:80 {
+	encode zstd gzip
+
+	# Express mounts its routes under /api/* — preserve the prefix (no strip).
+	handle /api/* {
+		reverse_proxy api:4000
+	}
+
+	# The next/image loader builds URLs as <origin>/img/rs:.../plain/... so strip
+	# the /img prefix before handing off to imgproxy.
+	handle_path /img/* {
+		reverse_proxy imgproxy:8080
+	}
+
+	# Everything else goes to the Next.js app.
+	handle {
+		reverse_proxy web:3000
+	}
+}

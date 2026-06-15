@@ -1,0 +1,431 @@
+---
+description: kassythreads luxury beauty booking — stack, design system, priority components, and build order
+alwaysApply: true
+---
+
+# Cursor Prompt — kassythreads Luxury Beauty Booking Site
+
+---
+
+## Project Identity
+
+You are building **kassythreads** — a luxury hair removal and eyebrow threading studio with lash-lift services. The target audience is women aged 22–45 who value precision beauty work and expect a premium digital experience. The site must feel like a high-end spa brand, not a generic booking widget. The reference aesthetic is https://poshbrowspro.com/ — editorial, cinematic, social-proof-driven — but more refined and owned end-to-end.
+
+The site is **not a brochure with a Booksy link**. It is a fully owned booking platform. Booksy is being replaced entirely. Every design and engineering decision should reflect that this is the client's permanent digital home — not a placeholder.
+
+---
+
+## Stack
+
+```
+apps/
+├── web/          # Next.js 15 App Router (RSC-first)
+└── api/          # Express + Mikro-ORM + PostgreSQL
+
+Infrastructure (Docker Compose profiles: local | prod):
+  postgres        # PostgreSQL 16
+  minio           # Object storage (videos, images, assets)
+  imgproxy        # On-the-fly image optimization (WebP, resize, crop)
+  ntfy            # Push notifications
+  caddy           # Reverse proxy + auto SSL (prod only)
+```
+
+**Frontend decisions:**
+- Next.js 15 App Router — RSC for all static/marketing surfaces, `'use client'` only where interactivity is required
+- Tailwind CSS v4
+- Framer Motion — scroll-triggered entrance animations, slow luxury cubic-bezier curves
+- Embla Carousel — service cards, testimonials, before/after gallery
+- `react-compare-slider` — before/after treatment reveals
+- Custom imgproxy loader for `next/image`
+- No `react-slick`, no jQuery-based carousel libraries
+
+**Backend decisions:**
+- Express REST API at `/api/*`
+- Mikro-ORM with PostgreSQL — single ORM, single migration system
+- MinIO for all media (videos, images, before/after photos)
+- imgproxy sidecar for image transforms
+- Resend for transactional email
+- Stripe for deposits and payments
+
+---
+
+## Architecture
+
+```
+apps/web/src/app/
+├── (marketing)/              # RSC — zero JS shipped, static/ISR
+│   ├── page.tsx              # Homepage
+│   ├── services/page.tsx
+│   └── layout.tsx
+├── (booking)/                # SSR + client components
+│   ├── book/page.tsx
+│   ├── account/page.tsx
+│   └── layout.tsx
+└── (admin)/                  # Auth-gated, internal
+    └── dashboard/
+
+apps/web/src/components/
+├── server/                   # Pure RSC — no 'use client'
+│   ├── VideoHero.tsx         # ← PRIORITY
+│   ├── GifProductSection.tsx # ← PRIORITY
+│   ├── UGCGallery.tsx        # ← PRIORITY
+│   ├── ServicesGrid.tsx
+│   ├── SocialWall.tsx
+│   └── ParallaxSection.tsx
+└── client/                   # 'use client' components
+    ├── BookingFlow.tsx
+    ├── EmblaCarousel.tsx
+    ├── BeforeAfterSlider.tsx
+    ├── MobileMenu.tsx
+    └── AnimatedSection.tsx
+```
+
+---
+
+## Design System
+
+### Palette
+```
+--color-bg:        #0a0a08    /* near-black warm */
+--color-surface:   #111110    /* card/section backgrounds */
+--color-border:    #1e1e1c    /* subtle dividers */
+--color-gold:      #c9a96e    /* primary accent — warm gold, not yellow */
+--color-gold-muted:#8a7050    /* secondary gold for borders, icons */
+--color-cream:     #f5f0e8    /* primary text on dark */
+--color-muted:     #7a7570    /* subtext, captions */
+--color-white:     #ffffff    /* high-contrast moments only */
+```
+
+### Typography
+```
+Display:  "Cormorant Garamond" — weight 300–400, tracked wide, uppercase for labels
+Body:     "DM Sans" — weight 300–400, generous line-height (1.7)
+Utility:  "DM Mono" — prices, booking times, status indicators
+```
+
+Load via `next/font/google`. Never use system fonts on public-facing surfaces.
+
+### Motion Signature
+All entrance animations use this cubic-bezier — it feels unhurried and expensive:
+```ts
+const LUXURY_EASE = [0.22, 1, 0.36, 1]
+const LUXURY_DURATION = 0.85
+
+// Standard entrance
+{ opacity: 0, y: 32 } → { opacity: 1, y: 0, transition: { duration: LUXURY_DURATION, ease: LUXURY_EASE } }
+
+// Stagger children (service cards, gallery items)
+staggerChildren: 0.1
+
+// Always use whileInView + viewport={{ once: true }}
+// Never animate on every scroll pass
+```
+
+Never use spring physics or bounce easing on a luxury brand. Never use `ease-in-out` — it reads generic.
+
+### Image Optimization
+All images served through imgproxy. Use the custom loader:
+
+```ts
+// lib/imgproxy-loader.ts
+export default function imgproxyLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
+  const base = process.env.NEXT_PUBLIC_IMGPROXY_URL
+  return `${base}/rs:fill:${width}/q:${quality ?? 82}/plain/${src}@webp`
+}
+```
+
+Register in `next.config.ts`:
+```ts
+images: {
+  loader: 'custom',
+  loaderFile: './src/lib/imgproxy-loader.ts',
+}
+```
+
+---
+
+## Priority Components — Build These First
+
+### 1. VideoHero (server component)
+
+**Reference:** The Posh Brows homepage opens with a full-viewport muted autoplay video loop showing hands performing threading/lash work in close-up. The effect is cinematic and immediate.
+
+**Requirements:**
+- Full viewport height (`100svh` — use `svh` not `vh` for mobile Safari)
+- Muted, autoplay, loop, playsInline — all four attributes required
+- `preload="metadata"` — do not block page load with video download
+- `poster` attribute pointing to a WebP still from imgproxy (first frame of the video)
+- Video stored in MinIO, referenced via env var `NEXT_PUBLIC_MINIO_URL`
+- Dark gradient overlay: `linear-gradient(to bottom, rgba(10,10,8,0.2) 0%, rgba(10,10,8,0.6) 60%, rgba(10,10,8,0.95) 100%)`
+- Headline: Cormorant Garamond, 300 weight, ~80px desktop / 48px mobile, centered, cream, tracked `0.15em`
+- Subhead: DM Sans, 300 weight, ~16px, muted color, tracked `0.3em`, uppercase
+- CTA: ghost button with 1px gold border, cream text, no fill — hover fills with gold at 10% opacity
+- Scrolling marquee below the fold break: alternating "THREADING · LASH LIFT · BROW DESIGN ·" in DM Mono, gold color, 12px
+- Mobile: video plays on iOS (playsInline is critical), headline drops to 42px, CTA is full-width
+
+```tsx
+// Approximate structure
+export default function VideoHero() {
+  return (
+    <section style={{ position: 'relative', height: '100svh', overflow: 'hidden' }}>
+      <video
+        autoPlay muted loop playsInline
+        preload="metadata"
+        poster={`${process.env.NEXT_PUBLIC_IMGPROXY_URL}/rs:fill:1920:1080/plain/${HERO_VIDEO_POSTER}@webp`}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      >
+        <source src={`${process.env.NEXT_PUBLIC_MINIO_URL}/videos/hero.mp4`} type="video/mp4" />
+      </video>
+      <div className="overlay"> {/* gradient + content */} </div>
+    </section>
+  )
+}
+```
+
+**Performance rules:**
+- Video file must be under 8MB (H.264, CRF 28, 1080p max) — add a comment in the component noting this constraint
+- Do not autoplay on `prefers-reduced-motion: reduce` — respect this media query
+- Poster image must load before video — it is the first visual impression
+
+---
+
+### 2. GifProductSection (server component)
+
+**Reference:** Posh Brows uses a 3-panel section with animated GIFs showing products in use — each GIF has a caption and a shop/learn CTA. This is the section immediately below the hero. It drives conversion on specific services.
+
+**Requirements:**
+- 3-column grid on desktop, stacked on mobile
+- Each panel: full-bleed GIF/video loop (treat short MP4 loops the same as GIFs — use `<video>` with no controls, autoplay, muted, loop, playsInline)
+- Panels stored in MinIO: `NEXT_PUBLIC_MINIO_URL/content/service-{slug}.mp4`
+- Dark semi-transparent overlay on each panel with service name and CTA
+- On hover: overlay fades slightly, a thin gold border appears on the panel
+- Service name: Cormorant Garamond, 400 weight, 28px, cream
+- CTA link: DM Sans, 300, 12px, gold, tracked `0.2em`, uppercase, underline on hover
+- Section background: `--color-surface`
+- Data driven — panels come from an API fetch to `/api/services/featured` at build time (RSC fetch)
+
+```tsx
+// Approximate structure
+const services = await fetch(`${process.env.API_URL}/api/services/featured`).then(r => r.json())
+
+return (
+  <section className="gif-product-section">
+    <div className="grid">
+      {services.map(service => (
+        <GifPanel key={service.id} service={service} />
+      ))}
+    </div>
+  </section>
+)
+```
+
+---
+
+### 3. UGCGallery — Instagram Social Wall (client component)
+
+**Reference:** Posh Brows ends the homepage with "SHOW OFF YOUR BROW SKILLS — TAG US using your favorite POSH BROWS products for a chance to be featured on our Instagram!" followed by a grid of real client/creator videos. This is the highest-converting social proof section on beauty brand sites.
+
+**This is the most complex of the three priority components.**
+
+**Architecture:**
+
+The Instagram Basic Display API provides a long-lived token for your own account. The Express backend polls this API every 6 hours and caches results in PostgreSQL. The Next.js frontend fetches from your own `/api/instagram/feed` — not directly from Instagram. This means:
+- No CORS issues
+- No rate limit exposure on the client
+- Content survives Instagram API outages
+- You control which posts display (approved status in DB)
+
+```ts
+// api/src/services/instagram.service.ts
+// Responsibilities:
+// - Exchange short-lived token → long-lived token (60 day refresh)
+// - Poll GET /me/media?fields=id,media_type,media_url,thumbnail_url,permalink,timestamp
+// - Upsert into instagram_posts table
+// - Cron: refresh every 6 hours
+
+// Entity fields:
+// id, instagram_id, media_type (IMAGE|VIDEO|CAROUSEL_ALBUM),
+// media_url, thumbnail_url, permalink, timestamp, approved, featured
+```
+
+**Frontend UGC Gallery component requirements:**
+- Masonry or uniform grid — 4 columns desktop, 2 columns mobile
+- Each cell: square crop, `object-fit: cover`
+- VIDEO type posts: render as muted autoplay loop (same pattern as hero)
+- IMAGE type posts: render via imgproxy for WebP + resize
+- Hover state: gold overlay with Instagram icon and "View Post" link
+- Clicking opens the `permalink` in a new tab — never embed Instagram's own iframe
+- "Follow us @handle" CTA below the grid — ghost button, gold border
+- Section header: "AS SEEN ON OUR CLIENTS" in Cormorant Garamond, tracked wide
+- Subhead: "Tag #kassythreads to be featured" in DM Sans muted
+
+```tsx
+'use client'
+
+// Fetch at page level (RSC parent) and pass as prop — do not fetch inside the client component
+// This keeps the social wall data in the static render, not a client-side waterfall
+
+export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
+  return (
+    <section className="ugc-gallery">
+      <header> {/* section heading */} </header>
+      <div className="ugc-grid">
+        {posts.map(post => (
+          <UGCCell key={post.id} post={post} />
+        ))}
+      </div>
+    </section>
+  )
+}
+```
+
+**Data fetching in RSC parent:**
+```tsx
+// In (marketing)/page.tsx
+const posts = await fetch(`${process.env.API_URL}/api/instagram/feed?approved=true&limit=12`, {
+  next: { revalidate: 21600 } // ISR — revalidate every 6 hours, matches cron
+}).then(r => r.json())
+
+return (
+  <>
+    <VideoHero />
+    <GifProductSection />
+    {/* ... */}
+    <UGCGallery posts={posts} />
+  </>
+)
+```
+
+---
+
+## General Engineering Rules
+
+### RSC Boundary Rules
+- `VideoHero`, `ServicesGrid`, `GifProductSection`, `SocialWall` — server components, no `'use client'`
+- `BookingFlow`, `EmblaCarousel`, `BeforeAfterSlider`, `MobileMenu` — client components
+- `UGCGallery` shell is client (hover interactions), but data is fetched in RSC parent and passed as props
+- Never fetch data inside a client component if it can be fetched in an RSC parent
+
+### Tailwind Rules
+- Use CSS variables from the design system as Tailwind theme extensions — do not hardcode hex values in className strings
+- `100svh` not `100vh` everywhere height: screen is used
+- `prefers-reduced-motion: reduce` respected on all animations
+
+### Framer Motion Rules
+- All public-facing animations: `whileInView` + `viewport={{ once: true }}`
+- Easing: always `LUXURY_EASE = [0.22, 1, 0.36, 1]`, never spring, never bounce
+- Wrap Framer Motion components in a `'use client'` wrapper — never import motion in a server component directly
+
+```tsx
+// components/client/AnimatedSection.tsx
+'use client'
+import { motion } from 'framer-motion'
+export const LUXURY_EASE = [0.22, 1, 0.36, 1]
+export { motion }
+```
+
+### Embla Carousel Rules
+- Use `embla-carousel-react` with `embla-carousel-autoplay` plugin
+- Autoplay config: `{ delay: 5000, stopOnInteraction: true }`
+- Loop: true, align: 'start'
+- Never use react-slick, Swiper, or any carousel with a jQuery dependency
+- Custom prev/next buttons — never use Embla's default arrows (they are not luxury)
+
+### Video Rules
+Every video element on the site must have: `autoPlay muted loop playsInline preload="metadata"`
+Missing any of these breaks iOS Safari autoplay. This is non-negotiable.
+
+### MinIO Asset Convention
+```
+videos/hero.mp4                    # Hero video
+videos/hero-poster.jpg             # Hero poster still
+content/service-{slug}.mp4        # GIF product section panels
+gallery/before-after/{id}.jpg      # Before/after gallery
+instagram/cache/{instagram_id}.jpg # Cached Instagram thumbnails
+```
+
+### API Conventions
+```
+GET  /api/services/featured        # 3 featured services for GifProductSection
+GET  /api/services                 # All services for ServicesGrid
+GET  /api/instagram/feed           # Cached Instagram posts (approved=true)
+GET  /api/availability             # Available slots (booking flow)
+POST /api/bookings                 # Create booking
+POST /api/stripe/checkout          # Stripe deposit session
+```
+
+---
+
+## Deploy Model (Do Not Change)
+
+The deploy flow is:
+```bash
+# Local development
+docker compose --profile local up
+
+# Production (on VPS after SSH + git pull)
+docker compose --profile prod run --rm api pnpm mikro-orm migration:up
+docker compose --profile prod up -d --build
+docker image prune -f
+```
+
+`compose.yml` profiles:
+- `local` — all services, hot reload, no Caddy
+- `prod` — all services, built images, Caddy with auto SSL
+
+imgproxy sidecar in `compose.yml`:
+```yaml
+imgproxy:
+  image: darthsim/imgproxy:latest
+  profiles: [local, prod]
+  environment:
+    IMGPROXY_USE_S3: "true"
+    IMGPROXY_S3_ENDPOINT: http://minio:9000
+    AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+    AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+    IMGPROXY_KEY: ${IMGPROXY_KEY}
+    IMGPROXY_SALT: ${IMGPROXY_SALT}
+  depends_on:
+    - minio
+```
+
+---
+
+## What To Build First (Ordered)
+
+1. `VideoHero.tsx` — server component, full viewport, muted video, gradient overlay, headline + CTA
+2. `GifProductSection.tsx` — server component, 3-panel grid, short video loops, service CTAs
+3. `UGCGallery.tsx` — client component shell + RSC data fetch, 4-col grid, hover states
+4. `instagram.service.ts` — Express service, token management, 6hr cron, Postgres upsert
+5. `/api/instagram/feed` route — filtered, approved posts, paginated
+6. `EmblaCarousel.tsx` — reusable carousel for testimonials and service cards
+7. `BeforeAfterSlider.tsx` — react-compare-slider wrapper with gold handle styling
+8. `ServicesGrid.tsx` — server component, pricing, service descriptions
+9. `BookingFlow.tsx` — multi-step client component, availability, Stripe deposit
+
+Do not build the admin dashboard, auth system, or booking flow until components 1–3 are pixel-perfect and the design system is locked.
+
+---
+
+## Acceptance Criteria for Priority Components
+
+### VideoHero
+- [ ] Plays on first load in Chrome, Safari iOS, Firefox
+- [ ] Poster image visible before video loads
+- [ ] No layout shift on load (explicit height: 100svh)
+- [ ] Does not autoplay when `prefers-reduced-motion` is set
+- [ ] Gradient overlay makes text legible at all viewport widths
+- [ ] CTA button navigates to `/book`
+
+### GifProductSection
+- [ ] 3 panels fetch from `/api/services/featured` at build time
+- [ ] Videos loop seamlessly with no flash between loops
+- [ ] Hover border + overlay transition is under 200ms
+- [ ] Grid collapses to single column below 768px
+
+### UGCGallery
+- [ ] 12 posts render from cached Postgres data (not live Instagram API)
+- [ ] VIDEO posts autoplay in grid, IMAGE posts render as WebP via imgproxy
+- [ ] Clicking any post opens Instagram permalink in new tab
+- [ ] Grid reflows to 2 columns on mobile
+- [ ] "Follow us" CTA links to the studio's Instagram profile

@@ -1,0 +1,48 @@
+# Production deploy to the Hostinger VPS over SSH.
+#
+# There is no container registry — images are built on the VPS. This job just
+# SSHes in, pulls the latest code, builds the images, runs DB migrations, and
+# restarts the prod stack (web, api, postgres, minio, imgproxy, caddy,
+# cloudflared). Cloudflare Tunnel exposes it to the internet.
+#
+# Manual for now (workflow_dispatch). Once the VPS + secrets are in place,
+# uncomment the `push` trigger below to deploy automatically on every push to
+# main.
+#
+# Required repository secrets:
+#   VPS_HOST     — server IP or hostname
+#   VPS_USER     — SSH user
+#   VPS_SSH_KEY  — private key with access to the VPS
+#   VPS_PORT     — SSH port (optional, defaults to 22)
+#   VPS_APP_DIR  — absolute path to the repo checkout on the VPS
+name: Deploy (VPS)
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            cd "${{ secrets.VPS_APP_DIR }}"
+            git fetch --all --prune
+            git reset --hard origin/main
+            docker compose --profile prod build
+            docker compose --profile prod run --rm api pnpm mikro-orm migration:up
+            docker compose --profile prod up -d
+            docker image prune -f

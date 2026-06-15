@@ -1,0 +1,2 @@
+# Pure RSC components live here (VideoHero, GifProductSection, ServicesGrid, ...).
+# No 'use client' in this directory.

@@ -1,0 +1,153 @@
+# KassyThreads infrastructure.
+# Profiles:
+#   local — all services with hot reload, no Caddy (direct host ports)
+#   prod  — built images + Caddy reverse proxy with automatic SSL
+#
+# Usage:
+#   docker compose --profile local up
+#   docker compose --profile prod up -d --build
+
+name: kassythreads
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: [local, prod]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    profiles: [local, prod]
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./data/minio:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  imgproxy:
+    image: darthsim/imgproxy:latest
+    profiles: [local, prod]
+    restart: unless-stopped
+    environment:
+      IMGPROXY_USE_S3: "true"
+      IMGPROXY_S3_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      IMGPROXY_KEY: ${IMGPROXY_KEY}
+      IMGPROXY_SALT: ${IMGPROXY_SALT}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    profiles: [local, prod]
+    restart: unless-stopped
+    command: serve
+    environment:
+      NTFY_BASE_URL: ${NTFY_BASE_URL}
+    volumes:
+      - ./data/ntfy:/var/lib/ntfy
+    ports:
+      - "8090:80"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    profiles: [local, prod]
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 4000
+      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      WEB_ORIGIN: ${WEB_ORIGIN}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN}
+      INSTAGRAM_USER_ID: ${INSTAGRAM_USER_ID}
+      NTFY_BASE_URL: ${NTFY_BASE_URL}
+      NTFY_TOPIC: ${NTFY_TOPIC}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    profiles: [local, prod]
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3000
+      API_URL: ${API_URL}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_MINIO_URL: ${NEXT_PUBLIC_MINIO_URL}
+      NEXT_PUBLIC_IMGPROXY_URL: ${NEXT_PUBLIC_IMGPROXY_URL}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+  # Internal reverse proxy (production only). Single-origin path routing for
+  # web / api / imgproxy. No public ports — reached only via cloudflared.
+  caddy:
+    image: caddy:2-alpine
+    profiles: [prod]
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    depends_on:
+      - web
+      - api
+      - imgproxy
+
+  # Cloudflare Tunnel — exposes the app to the internet without opening any
+  # inbound ports. cloudflared dials out to Cloudflare; the public hostname is
+  # mapped to http://caddy:80 in the Cloudflare Zero Trust dashboard.
+  # Create a tunnel there, copy its token, and set TUNNEL_TOKEN in .env.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles: [prod]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      - caddy

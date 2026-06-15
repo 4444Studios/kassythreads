@@ -1,0 +1,24 @@
+{
+  "name": "kassythreads",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KassyThreads — luxury eyebrow threading and lash-lift studio booking platform",
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm --filter \"./apps/*\" build",
+    "build:demo": "pnpm --filter web build:demo",
+    "lint": "pnpm --filter \"./apps/*\" lint",
+    "typecheck": "pnpm --filter \"./apps/*\" typecheck",
+    "compose:local": "docker compose --profile local up",
+    "compose:prod": "docker compose --profile prod up -d --build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

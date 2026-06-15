@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/*
+  KassyThreads design system.
+  Palette + typography + motion tokens are exposed through Tailwind v4's @theme
+  so they become first-class utilities (bg-bg, text-cream, text-gold, font-display, ...).
+  Do not hardcode hex values in className strings — reference these tokens instead.
+*/
+@theme {
+  /* Palette */
+  --color-bg: #0a0a08; /* near-black warm */
+  --color-surface: #111110; /* card/section backgrounds */
+  --color-border: #1e1e1c; /* subtle dividers */
+  --color-gold: #c9a96e; /* primary accent — warm gold, not yellow */
+  --color-gold-muted: #8a7050; /* secondary gold for borders, icons */
+  --color-cream: #f5f0e8; /* primary text on dark */
+  --color-muted: #7a7570; /* subtext, captions */
+  --color-white: #ffffff; /* high-contrast moments only */
+
+  /* Typography — backed by next/font CSS variables from the root layout */
+  --font-display: var(--font-cormorant), "Cormorant Garamond", serif;
+  --font-body: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), "DM Mono", ui-monospace, monospace;
+
+  /* Motion signature — unhurried, expensive */
+  --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-luxury: 850ms;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-cream);
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.7;
+  background-color: var(--color-bg);
+  color: var(--color-cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Respect users who prefer reduced motion across the whole site. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
