@@ -4,6 +4,12 @@ Luxury eyebrow threading and lash-lift studio booking platform. A fully owned
 booking site (not a Booksy embed): cinematic marketing surfaces backed by a
 self-hosted API, media storage, and on-the-fly image optimization.
 
+**Repository:** [github.com/4444Studios/kassythreads](https://github.com/4444Studios/kassythreads)
+
+```bash
+git clone git@github.com:4444Studios/kassythreads.git
+```
+
 ## Stack
 
 | Layer        | Tech                                                        |
@@ -62,9 +68,9 @@ Output lands in `apps/web/out/`.
 (`.github/workflows/demo-pages.yml`) builds and deploys this automatically on
 every push to `main`. One-time setup:
 
-1. Push this repo to GitHub as **`kassythreads`**.
+1. Repo lives under the **4444Studios** org as **`kassythreads`**.
 2. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. The site goes live at `https://<user>.github.io/kassythreads/`.
+3. The site goes live at `https://4444studios.github.io/kassythreads/`.
 
 The `basePath` is derived from the repo name automatically, so the demo only
 matches the URL when the repo is named `kassythreads`.
@@ -84,7 +90,11 @@ inbound ports are opened**; Caddy runs internally only for path routing
 
 1. Install Docker + the Compose plugin on the VPS.
 2. Clone this repo and create `.env` (see `.env.example`, use the production
-   overrides at the bottom).
+   overrides at the bottom):
+
+   ```bash
+   git clone git@github.com:4444Studios/kassythreads.git
+   ```
 3. Create a tunnel in the **Cloudflare Zero Trust** dashboard, add a public
    hostname (`kassythreads.com`) pointing at `http://caddy:80`, copy the tunnel
    token into `TUNNEL_TOKEN` in `.env`.
