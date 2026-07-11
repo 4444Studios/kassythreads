@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ANNOUNCEMENT, STUDIO } from "@/lib/studio";
 
 const NAV_LINKS = [
@@ -162,9 +163,9 @@ export function SiteHeader() {
           </button>
         </div>
 
-        <a className="site-wordmark" href="/">
+        <Link className="site-wordmark" href="/">
           {STUDIO.wordmark}
-        </a>
+        </Link>
 
         <div className="site-brand-right">
           <a
