@@ -1,12 +1,15 @@
-# Builds the marketing homepage as a static demo and publishes it to GitHub
-# Pages. This is for previews only (e.g. showing the client) — production runs
-# on the VPS (see deploy.yml). No API, MinIO, or imgproxy: the site renders from
-# the bundled demo assets in apps/web/public/demo via NEXT_PUBLIC_DEMO_MODE=1.
+# Builds both design versions as static demos and publishes them to GitHub Pages.
+# Production runs on the VPS (see deploy.yml).
+#
+# Output structure:
+#   /kassythreads/        — landing page linking to both versions
+#   /kassythreads/v1/     — main branch (warm editorial, Cormorant serif)
+#   /kassythreads/v2/     — ui/posh-v2 branch (bold Bebas Neue, bright whites)
 name: Demo (GitHub Pages)
 
 on:
   push:
-    branches: [main]
+    branches: [main, ui/posh-v2]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +17,7 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment; cancel in-progress runs on new pushes.
+# One deployment at a time; cancel in-progress runs on new pushes.
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -23,7 +26,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Fetch all branches so we can switch to ui/posh-v2 later.
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -35,21 +42,167 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build static demo
+      # ── V1: main branch ──────────────────────────────────────────────────────
+      - name: Build v1 (main)
         env:
-          # Project Pages are served from /<repo>, so the demo must be built
-          # with a matching basePath. Derived from the repo name automatically.
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/v1
         run: pnpm --filter web build:demo
 
-      - name: Disable Jekyll processing
-        run: touch apps/web/out/.nojekyll
+      - name: Stage v1 output
+        run: |
+          mkdir -p _site/v1
+          cp -r apps/web/out/. _site/v1/
+          rm -rf apps/web/out
+
+      # ── V2: ui/posh-v2 branch ────────────────────────────────────────────────
+      - name: Switch to ui/posh-v2
+        run: git checkout ui/posh-v2
+
+      - name: Build v2 (ui/posh-v2)
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}/v2
+        run: pnpm --filter web build:demo
+
+      - name: Stage v2 output
+        run: |
+          mkdir -p _site/v2
+          cp -r apps/web/out/. _site/v2/
+          rm -rf apps/web/out
+
+      # ── Root landing page ─────────────────────────────────────────────────────
+      - name: Create root landing page
+        env:
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          cat > _site/index.html << HTMLEOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Kassy Threads — Design Preview</title>
+            <style>
+              *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: #fff;
+                color: #111;
+                min-height: 100svh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 48px 24px;
+                gap: 0;
+              }
+              .eyebrow {
+                font-size: 11px;
+                letter-spacing: 0.28em;
+                text-transform: uppercase;
+                color: #aaa;
+                margin-bottom: 18px;
+                text-align: center;
+              }
+              h1 {
+                font-size: clamp(26px, 5vw, 44px);
+                font-weight: 300;
+                letter-spacing: 0.04em;
+                text-align: center;
+                margin-bottom: 12px;
+              }
+              .sub {
+                font-size: 14px;
+                color: #888;
+                margin-bottom: 52px;
+                text-align: center;
+                max-width: 400px;
+                line-height: 1.6;
+              }
+              .cards {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                width: 100%;
+                max-width: 620px;
+              }
+              .card {
+                border: 1px solid #e2e2e2;
+                padding: 32px 28px 28px;
+                text-decoration: none;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+                transition: border-color 200ms, box-shadow 200ms;
+              }
+              .card:hover {
+                border-color: #c9a96e;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+              }
+              .card-label {
+                font-size: 10px;
+                letter-spacing: 0.24em;
+                text-transform: uppercase;
+                color: #c9a96e;
+                margin-bottom: 14px;
+              }
+              .card-title {
+                font-size: 19px;
+                font-weight: 400;
+                margin-bottom: 10px;
+                letter-spacing: 0.01em;
+              }
+              .card-desc {
+                font-size: 13px;
+                color: #888;
+                line-height: 1.6;
+                flex: 1;
+              }
+              .card-cta {
+                display: inline-block;
+                margin-top: 22px;
+                font-size: 11px;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                color: #111;
+                border-bottom: 1px solid #c9a96e;
+                padding-bottom: 2px;
+              }
+              @media (max-width: 520px) {
+                .cards { grid-template-columns: 1fr; }
+                body { padding: 40px 20px; }
+              }
+            </style>
+          </head>
+          <body>
+            <p class="eyebrow">Kassy Threads &middot; Design Preview</p>
+            <h1>Two Directions, One Choice</h1>
+            <p class="sub">Review both versions below and let us know which one feels most like you.</p>
+            <div class="cards">
+              <a class="card" href="/${REPO}/v1/">
+                <p class="card-label">Version 1 &middot; Current</p>
+                <h2 class="card-title">Warm Editorial</h2>
+                <p class="card-desc">Elegant serif type, warm gold-beige palette. Refined and inviting.</p>
+                <span class="card-cta">View V1 &rarr;</span>
+              </a>
+              <a class="card" href="/${REPO}/v2/">
+                <p class="card-label">Version 2 &middot; New Direction</p>
+                <h2 class="card-title">Bold &amp; Bright</h2>
+                <p class="card-desc">Impact headlines, bright whites, high-energy graphic feel.</p>
+                <span class="card-cta">View V2 &rarr;</span>
+              </a>
+            </div>
+          </body>
+          </html>
+          HTMLEOF
+
+      - name: Disable Jekyll
+        run: touch _site/.nojekyll
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/web/out
+          path: _site
 
   deploy:
     needs: build
