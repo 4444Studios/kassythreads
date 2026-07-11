@@ -100,7 +100,7 @@ export default async function ServicesGrid() {
       `}</style>
 
       <header className="services-head">
-        <p className="services-eyebrow">Studio Menu</p>
+        <p className="services-eyebrow">What We Do</p>
         <h2 className="services-title">Services &amp; Pricing</h2>
       </header>
 

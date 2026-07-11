@@ -199,10 +199,10 @@ export default async function ProductsSection() {
       `}</style>
 
       <header className="products-head">
-        <p className="products-eyebrow">Shop the Studio</p>
-        <h2 className="products-title">Take the Experience Home</h2>
+        <p className="products-eyebrow">Take the Glow Home</p>
+        <h2 className="products-title">Studio Favorites</h2>
         <p className="products-subhead">
-          Retail favorites curated for your at-home brow ritual.
+          Curated picks to keep your brows looking fresh between appointments.
         </p>
       </header>
 
@@ -231,8 +231,7 @@ export default async function ProductsSection() {
       ) : (
         <div className="products-empty">
           <p>
-            Retail collection launching soon. Follow {STUDIO.instagramHandle}{" "}
-            for drops.
+            Something good is coming. Follow {STUDIO.instagramHandle} to be the first to know.
           </p>
           <a
             href={STUDIO.instagramUrl}

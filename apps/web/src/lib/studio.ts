@@ -16,4 +16,4 @@ export const STUDIO = {
 } as const;
 
 export const ANNOUNCEMENT =
-  `${STUDIO.booksyRating} ★ · ${STUDIO.booksyReviewCount} Reviews · ${STUDIO.addressShort}` as const;
+  `${STUDIO.booksyRating} ★ · ${STUDIO.booksyReviewCount} Happy Clients · ${STUDIO.addressShort}` as const;

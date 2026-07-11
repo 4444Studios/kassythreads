@@ -74,7 +74,7 @@ function GifPanel({ service }: { service: FeaturedService }) {
       <div className="gif-panel-overlay">
         <h3 className="gif-panel-name">{service.name}</h3>
         <a className="gif-panel-cta" href={`/services/${service.slug}`}>
-          Explore Service
+          Learn More
         </a>
       </div>
     </article>

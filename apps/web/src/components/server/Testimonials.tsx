@@ -90,7 +90,7 @@ export default function Testimonials() {
       `}</style>
 
       <header className="testimonials-head">
-        <p className="testimonials-eyebrow">Kind Words</p>
+        <p className="testimonials-eyebrow">They Said It Best</p>
         <h2 className="testimonials-title">Loved by Our Clients</h2>
         <p className="testimonials-rating">
           {STUDIO.booksyRating} ★ · {STUDIO.booksyReviewCount} Reviews on{" "}

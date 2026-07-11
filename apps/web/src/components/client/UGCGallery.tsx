@@ -192,9 +192,9 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
       `}</style>
 
       <header className="ugc-header">
-        <h2 className="ugc-title">As Seen On Our Clients</h2>
+        <h2 className="ugc-title">Show Us Your Brows</h2>
         <p className="ugc-subhead">
-          Tag {INSTAGRAM_HANDLE} for a chance to be featured
+          Tag {INSTAGRAM_HANDLE} — we love seeing you shine
         </p>
       </header>
 
@@ -211,7 +211,7 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Follow Us {INSTAGRAM_HANDLE}
+          Follow {INSTAGRAM_HANDLE}
         </a>
       </div>
     </section>

@@ -58,7 +58,7 @@ function FeaturedCard({ service }: { service: FeaturedService }) {
         <p className="feat-card-price">{formatPrice(service.priceCents)}</p>
       ) : null}
       <a className="feat-card-cta" href={`/book?service=${service.slug}`}>
-        Book →
+        Book Now →
       </a>
     </article>
   );
@@ -173,7 +173,7 @@ export default async function FeaturedCarousel() {
       `}</style>
 
       <header className="feat-head">
-        <p className="feat-eyebrow">Signature Services</p>
+        <p className="feat-eyebrow">Client Favorites</p>
         <h2 className="feat-title" id="feat-title">
           Most Loved
         </h2>

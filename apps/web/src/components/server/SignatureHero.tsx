@@ -187,20 +187,20 @@ export default function SignatureHero() {
         <p className="sig-hero-eyebrow">
           {STUDIO.city.toUpperCase()} · EYEBROW THREADING
         </p>
-        <h1 className="sig-hero-headline">Your brows, perfected.</h1>
+        <h1 className="sig-hero-headline">Brows you&apos;ll obsess over.</h1>
         <p className="sig-hero-subhead">
-          Precision eyebrow threading, brow lamination &amp; lash lifts — calm
-          studio care in {STUDIO.city}, {STUDIO.state}.
+          Expert threading, brow lamination &amp; lash lifts — by Kassey.
+          Because when your brows are right, everything feels right.
         </p>
         <div className="sig-hero-actions">
           <a
             className="sig-hero-cta sig-hero-cta--primary"
             href="/book?service=eyebrow-threading-returning"
           >
-            Book Eyebrow Threading
+            Book Your Appointment
           </a>
           <a className="sig-hero-cta sig-hero-cta--ghost" href="#services">
-            View All Services
+            See What We Offer
           </a>
         </div>
         <p className="sig-hero-tagline">
