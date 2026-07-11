@@ -4,9 +4,10 @@ import { Migrator } from "@mikro-orm/migrations";
 import { BaseEntity } from "./entities/BaseEntity";
 import { Service } from "./entities/Service";
 import { InstagramPost } from "./entities/InstagramPost";
+import { Product } from "./entities/Product";
 
 export default defineConfig({
-  entities: [BaseEntity, Service, InstagramPost],
+  entities: [BaseEntity, Service, InstagramPost, Product],
   // Prefer a single connection string; fall back to discrete vars for local dev.
   clientUrl: process.env.DATABASE_URL,
   host: process.env.POSTGRES_HOST ?? "localhost",

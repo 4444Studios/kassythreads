@@ -71,14 +71,17 @@ export function EmblaCarousel({
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           background: transparent;
-          border: 1px solid var(--color-gold);
+          border: 1px solid var(--color-accent);
           border-radius: 50%;
           cursor: pointer;
-          transition: background 200ms ease-out;
+          transition: background 200ms ease-out, color 200ms ease-out;
         }
-        .embla__btn:hover { background: rgba(201, 169, 110, 0.1); }
+        .embla__btn:hover {
+          background: var(--color-accent);
+          color: var(--color-white);
+        }
         @media (max-width: 767px) {
           .embla__slide { padding: 0 6px; }
           .embla__controls { margin-top: 28px; gap: 20px; }

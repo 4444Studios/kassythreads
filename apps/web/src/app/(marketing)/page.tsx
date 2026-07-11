@@ -1,23 +1,25 @@
-import VideoHero from "@/components/server/VideoHero";
+import SignatureHero from "@/components/server/SignatureHero";
 import GifProductSection from "@/components/server/GifProductSection";
+import FeaturedCarousel from "@/components/server/FeaturedCarousel";
 import ServicesGrid from "@/components/server/ServicesGrid";
+import ProductsSection from "@/components/server/ProductsSection";
 import BeforeAfterSection from "@/components/server/BeforeAfterSection";
 import Testimonials from "@/components/server/Testimonials";
 import { UGCGallery } from "@/components/client/UGCGallery";
 import { getInstagramFeed } from "@/lib/instagram";
 
 export default async function HomePage() {
-  // Fetch the social wall data here (RSC) and pass it down as props so it stays
-  // in the static render rather than a client-side waterfall.
   const posts = await getInstagramFeed(12);
 
   return (
     <main>
-      <VideoHero />
+      <SignatureHero />
       <GifProductSection />
+      <FeaturedCarousel />
       <ServicesGrid />
-      <BeforeAfterSection />
+      <ProductsSection />
       <Testimonials />
+      <BeforeAfterSection />
       <UGCGallery posts={posts} />
     </main>
   );

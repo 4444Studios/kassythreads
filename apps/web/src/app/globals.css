@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
 /*
-  KassyThreads design system.
+  KassyThreads design system — bright editorial (Posh Brows–inspired).
   Palette + typography + motion tokens are exposed through Tailwind v4's @theme
-  so they become first-class utilities (bg-bg, text-cream, text-gold, font-display, ...).
-  Do not hardcode hex values in className strings — reference these tokens instead.
+  so they become first-class utilities. Do not hardcode hex values in className
+  strings — reference these tokens instead.
 */
 @theme {
-  /* Palette */
-  --color-bg: #0a0a08; /* near-black warm */
-  --color-surface: #111110; /* card/section backgrounds */
-  --color-border: #1e1e1c; /* subtle dividers */
-  --color-gold: #c9a96e; /* primary accent — warm gold, not yellow */
-  --color-gold-muted: #8a7050; /* secondary gold for borders, icons */
-  --color-cream: #f5f0e8; /* primary text on dark */
-  --color-muted: #7a7570; /* subtext, captions */
-  --color-white: #ffffff; /* high-contrast moments only */
+  /* Palette — light, inviting, warm beige accents */
+  --color-bg: #ffffff;
+  --color-surface: #f7f4ef;
+  --color-surface-elevated: #fafafa;
+  --color-border: #e8e4dc;
+  --color-text: #1a1a18;
+  --color-muted: #6b6560;
+  --color-accent: #c9a96e;
+  --color-accent-dark: #8a7050;
+  --color-white: #ffffff;
+
+  /* Aliases — gold/cream kept for gradual migration & CTA continuity */
+  --color-gold: #c9a96e;
+  --color-gold-muted: #8a7050;
+  --color-cream: #1a1a18;
 
   /* Typography — backed by next/font CSS variables from the root layout */
   --font-display: var(--font-cormorant), "Cormorant Garamond", serif;
@@ -28,12 +34,12 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
   background-color: var(--color-bg);
-  color: var(--color-cream);
+  color: var(--color-text);
 }
 
 body {
@@ -41,7 +47,7 @@ body {
   font-weight: 300;
   line-height: 1.7;
   background-color: var(--color-bg);
-  color: var(--color-cream);
+  color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

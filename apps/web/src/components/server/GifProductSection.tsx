@@ -164,15 +164,18 @@ export default async function GifProductSection() {
 
         @media (max-width: 767px) {
           .gif-product-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
           }
-          /* Less towering when stacked; keep a tap-friendly, editorial frame. */
-          .gif-panel { aspect-ratio: 3 / 4; }
-          .gif-panel-overlay { padding: 0 20px 32px; gap: 10px; }
-          .gif-panel-name { font-size: 26px; }
-          /* Reveal the hover treatment on touch (no hover state on mobile). */
-          .gif-panel { border-color: var(--color-border); }
-          .gif-panel-overlay { background: rgba(10, 10, 8, 0.38); }
+          .gif-panel { aspect-ratio: 3 / 4; border-color: var(--color-border); }
+          .gif-panel-overlay { padding: 0 12px 24px; gap: 8px; background: rgba(10, 10, 8, 0.42); }
+          .gif-panel-name { font-size: 18px; }
+          .gif-panel-cta { font-size: 10px; letter-spacing: 0.15em; }
+        }
+        @media (max-width: 420px) {
+          .gif-product-grid { grid-template-columns: 1fr; }
+          .gif-panel { aspect-ratio: 4 / 3; }
+          .gif-panel-overlay { padding: 0 20px 28px; }
+          .gif-panel-name { font-size: 22px; }
         }
       `}</style>
 

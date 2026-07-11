@@ -4,10 +4,11 @@ import { RequestContext } from "@mikro-orm/core";
 import { getOrm } from "./db";
 import { servicesRouter } from "./routes/services.routes";
 import { instagramRouter } from "./routes/instagram.routes";
+import { productsRouter } from "./routes/products.routes";
 
 /**
- * Builds the Express app. Route handlers (services, instagram, availability,
- * bookings, stripe) are added later — this is the base scaffold only.
+ * Builds the Express app. Route handlers (services, products, instagram,
+ * availability, bookings, stripe) — booking/stripe added later.
  */
 export function createApp(): Express {
   const app = express();
@@ -25,6 +26,7 @@ export function createApp(): Express {
   });
 
   app.use("/api/services", servicesRouter);
+  app.use("/api/products", productsRouter);
   app.use("/api/instagram", instagramRouter);
 
   return app;

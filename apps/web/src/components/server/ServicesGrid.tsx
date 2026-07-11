@@ -1,7 +1,12 @@
-// Pure React Server Component — no 'use client'.
-// The full services menu with pricing. Fetches all services from the API and
-// falls back to demo data for client previews.
-import { isDemoMode, demoServices } from "@/lib/demo";
+// Pure React Server Component — full studio menu grouped by Booksy category.
+import {
+  isDemoMode,
+  demoServices,
+  SERVICE_CATEGORY_LABELS,
+  SERVICE_CATEGORY_ORDER,
+  type ServiceCategory,
+  type DemoService,
+} from "@/lib/demo";
 
 type ServiceItem = {
   id: string;
@@ -10,6 +15,8 @@ type ServiceItem = {
   description?: string;
   priceCents: number;
   durationMinutes: number;
+  category?: ServiceCategory;
+  priceVaries?: boolean;
 };
 
 async function getServices(): Promise<ServiceItem[]> {
@@ -27,24 +34,45 @@ async function getServices(): Promise<ServiceItem[]> {
       // fall through to demo / empty
     }
   }
-  if (isDemoMode()) return demoServices;
+  if (isDemoMode()) return demoServices as DemoService[];
   return [];
 }
 
-function formatPrice(cents: number): string {
-  const dollars = cents / 100;
+function formatPrice(service: ServiceItem): string {
+  if (service.priceVaries || service.priceCents === 0) return "Varies";
+  const dollars = service.priceCents / 100;
   return Number.isInteger(dollars) ? `$${dollars}` : `$${dollars.toFixed(2)}`;
+}
+
+function groupByCategory(
+  services: ServiceItem[],
+): { category: ServiceCategory; items: ServiceItem[] }[] {
+  const map = new Map<ServiceCategory, ServiceItem[]>();
+  for (const cat of SERVICE_CATEGORY_ORDER) map.set(cat, []);
+
+  for (const service of services) {
+    const cat = service.category ?? "threading";
+    const list = map.get(cat) ?? [];
+    list.push(service);
+    map.set(cat, list);
+  }
+
+  return SERVICE_CATEGORY_ORDER.filter((cat) => (map.get(cat)?.length ?? 0) > 0).map(
+    (category) => ({ category, items: map.get(category)! }),
+  );
 }
 
 export default async function ServicesGrid() {
   const services = await getServices();
   if (services.length === 0) return null;
 
+  const groups = groupByCategory(services);
+
   return (
-    <section className="services-grid">
+    <section className="services-grid" id="services">
       <style>{`
         .services-grid {
-          background: var(--color-bg);
+          background: var(--color-surface);
           padding: 96px 24px;
         }
         .services-head {
@@ -55,7 +83,7 @@ export default async function ServicesGrid() {
           margin: 0 0 14px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
@@ -64,16 +92,24 @@ export default async function ServicesGrid() {
           font-family: var(--font-display);
           font-weight: 300;
           font-size: 44px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.1em;
           text-transform: uppercase;
         }
-        .services-list {
+        .services-groups {
           max-width: 920px;
           margin: 0 auto;
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 2px 48px;
+          display: flex;
+          flex-direction: column;
+          gap: 48px;
+        }
+        .services-cat-title {
+          margin: 0 0 8px;
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--color-accent-dark);
         }
         .service-row {
           display: grid;
@@ -88,7 +124,7 @@ export default async function ServicesGrid() {
           font-family: var(--font-display);
           font-weight: 400;
           font-size: 22px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.03em;
         }
         .service-desc {
@@ -106,7 +142,7 @@ export default async function ServicesGrid() {
         .service-price {
           font-family: var(--font-mono);
           font-size: 16px;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           letter-spacing: 0.05em;
         }
         .service-duration {
@@ -116,11 +152,23 @@ export default async function ServicesGrid() {
           color: var(--color-muted);
           letter-spacing: 0.1em;
         }
+        .service-book {
+          display: inline-block;
+          margin-top: 8px;
+          font-family: var(--font-body);
+          font-size: 11px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--color-text);
+          text-decoration: none;
+          border-bottom: 1px solid var(--color-accent);
+        }
+        .service-book:hover { color: var(--color-accent-dark); }
         @media (max-width: 767px) {
           .services-grid { padding: 64px 20px; }
           .services-head { margin-bottom: 36px; }
           .services-title { font-size: 30px; }
-          .services-list { grid-template-columns: 1fr; gap: 0; }
+          .services-groups { gap: 36px; }
           .service-row { padding: 18px 0; gap: 16px; }
           .service-name { font-size: 20px; }
           .service-desc { font-size: 12.5px; margin-top: 5px; }
@@ -133,23 +181,34 @@ export default async function ServicesGrid() {
         <h2 className="services-title">Services &amp; Pricing</h2>
       </header>
 
-      <div className="services-list">
-        {services.map((service) => (
-          <div className="service-row" key={service.id}>
-            <div>
-              <h3 className="service-name">{service.name}</h3>
-              {service.description ? (
-                <p className="service-desc">{service.description}</p>
-              ) : null}
-            </div>
-            <div className="service-meta">
-              <div className="service-price">
-                {formatPrice(service.priceCents)}
+      <div className="services-groups">
+        {groups.map(({ category, items }) => (
+          <div key={category}>
+            <h3 className="services-cat-title">
+              {SERVICE_CATEGORY_LABELS[category]}
+            </h3>
+            {items.map((service) => (
+              <div className="service-row" key={service.id}>
+                <div>
+                  <h4 className="service-name">{service.name}</h4>
+                  {service.description ? (
+                    <p className="service-desc">{service.description}</p>
+                  ) : null}
+                </div>
+                <div className="service-meta">
+                  <div className="service-price">{formatPrice(service)}</div>
+                  <div className="service-duration">
+                    {service.durationMinutes} MIN
+                  </div>
+                  <a
+                    className="service-book"
+                    href={`/book?service=${service.slug}`}
+                  >
+                    Book
+                  </a>
+                </div>
               </div>
-              <div className="service-duration">
-                {service.durationMinutes} MIN
-              </div>
-            </div>
+            ))}
           </div>
         ))}
       </div>

@@ -4,10 +4,15 @@ import { Service } from "../entities/Service";
 
 export const servicesRouter = Router();
 
-/** GET /api/services — all services, ordered by name. */
-servicesRouter.get("/", async (_req: Request, res: Response) => {
+/** GET /api/services — all services, optionally filtered by ?category= */
+servicesRouter.get("/", async (req: Request, res: Response) => {
   const em = getOrm().em;
-  const services = await em.find(Service, {}, { orderBy: { name: "asc" } });
+  const category =
+    typeof req.query.category === "string" ? req.query.category : undefined;
+  const where = category ? { category } : {};
+  const services = await em.find(Service, where, {
+    orderBy: { category: "asc", name: "asc" },
+  });
   res.json(services);
 });
 

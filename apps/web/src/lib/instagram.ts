@@ -18,7 +18,7 @@ export type InstagramPost = {
 
 // Public studio handle for the "Follow us" CTA.
 export const INSTAGRAM_HANDLE = "@kassythreads";
-export const INSTAGRAM_PROFILE_URL = "https://instagram.com/kassythreads";
+export const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/kassythreads/";
 
 /**
  * Fetches approved, cached Instagram posts from our own API (never live IG).

@@ -29,12 +29,12 @@ export function BeforeAfterSlider({
         <ReactCompareSliderHandle
           buttonStyle={{
             backdropFilter: "none",
-            background: "var(--color-gold)",
-            border: 0,
-            color: "var(--color-bg)",
+          background: "var(--color-accent)",
+          border: 0,
+          color: "var(--color-white)",
             boxShadow: "0 0 0 1px rgba(201,169,110,0.5)",
           }}
-          linesStyle={{ color: "var(--color-gold)", width: 2 }}
+          linesStyle={{ color: "var(--color-accent)", width: 2 }}
         />
       }
       itemOne={

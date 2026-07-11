@@ -1,7 +1,8 @@
 // Server component — renders testimonial cards into the client EmblaCarousel.
-// Data is static demo content here; swap for an API fetch when reviews are live.
+// Quotes sourced from Booksy reviews (5.0 ★ · 391 reviews).
 import { EmblaCarousel } from "@/components/client/EmblaCarousel";
 import { demoTestimonials, type DemoTestimonial } from "@/lib/demo";
+import { STUDIO } from "@/lib/studio";
 
 const testimonials: DemoTestimonial[] = demoTestimonials;
 
@@ -23,7 +24,7 @@ export default function Testimonials() {
           margin: 0 0 14px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
@@ -32,10 +33,23 @@ export default function Testimonials() {
           font-family: var(--font-display);
           font-weight: 300;
           font-size: 44px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.1em;
           text-transform: uppercase;
         }
+        .testimonials-rating {
+          margin: 16px 0 0;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--color-muted);
+        }
+        .testimonials-rating a {
+          color: var(--color-accent-dark);
+          text-decoration: none;
+        }
+        .testimonials-rating a:hover { text-decoration: underline; }
         .testimonials-inner { max-width: 820px; margin: 0 auto; }
         .testimonial-card {
           text-align: center;
@@ -47,14 +61,14 @@ export default function Testimonials() {
           font-weight: 300;
           font-size: 28px;
           line-height: 1.4;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.02em;
         }
         .testimonial-author {
           margin: 28px 0 0;
           font-family: var(--font-mono);
           font-size: 12px;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           letter-spacing: 0.2em;
           text-transform: uppercase;
         }
@@ -78,6 +92,12 @@ export default function Testimonials() {
       <header className="testimonials-head">
         <p className="testimonials-eyebrow">Kind Words</p>
         <h2 className="testimonials-title">Loved by Our Clients</h2>
+        <p className="testimonials-rating">
+          {STUDIO.booksyRating} ★ · {STUDIO.booksyReviewCount} Reviews on{" "}
+          <a href={STUDIO.booksyUrl} target="_blank" rel="noopener noreferrer">
+            Booksy
+          </a>
+        </p>
       </header>
 
       <div className="testimonials-inner">

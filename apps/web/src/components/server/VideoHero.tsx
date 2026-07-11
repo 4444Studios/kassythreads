@@ -140,7 +140,7 @@ export default function VideoHero() {
             padding: 16px 24px;
             margin-top: 26px;
           }
-          .hero-marquee { bottom: 3.5%; }
+          .hero-marquee { bottom: calc(3.5% + env(safe-area-inset-bottom, 0px)); }
           .hero-marquee span { font-size: 9px; letter-spacing: 0.25em; }
         }
         @media (max-width: 380px) {

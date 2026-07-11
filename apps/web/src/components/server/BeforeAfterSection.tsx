@@ -11,13 +11,14 @@ export default function BeforeAfterSection() {
         .ba-section {
           background: var(--color-bg);
           padding: 96px 24px;
+          border-bottom: 1px solid var(--color-border);
         }
         .ba-head { text-align: center; margin-bottom: 48px; }
         .ba-eyebrow {
           margin: 0 0 14px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-gold);
+          color: var(--color-accent-dark);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
@@ -26,7 +27,7 @@ export default function BeforeAfterSection() {
           font-family: var(--font-display);
           font-weight: 300;
           font-size: 44px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.1em;
           text-transform: uppercase;
         }
@@ -37,6 +38,7 @@ export default function BeforeAfterSection() {
           aspect-ratio: 3 / 2;
           border: 1px solid var(--color-border);
           overflow: hidden;
+          background: var(--color-surface-elevated);
         }
         .ba-tag {
           position: absolute;
@@ -46,8 +48,9 @@ export default function BeforeAfterSection() {
           font-size: 11px;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: var(--color-cream);
-          background: rgba(10, 10, 8, 0.6);
+          color: var(--color-text);
+          background: rgba(255, 255, 255, 0.85);
+          border: 1px solid var(--color-border);
           padding: 6px 12px;
           pointer-events: none;
         }

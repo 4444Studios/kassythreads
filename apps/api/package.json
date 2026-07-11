@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "mikro-orm": "mikro-orm"
+    "mikro-orm": "mikro-orm",
+    "seed:services": "tsx src/seed/services.seed.ts"
   },
   "mikro-orm": {
     "useTsNode": true,

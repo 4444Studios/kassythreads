@@ -80,7 +80,7 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
     <section className="ugc-gallery">
       <style>{`
         .ugc-gallery {
-          background: var(--color-bg);
+          background: var(--color-surface);
           padding: 96px 24px;
         }
 
@@ -93,7 +93,7 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           font-family: var(--font-display);
           font-weight: 300;
           font-size: 40px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.12em;
           text-transform: uppercase;
         }
@@ -120,6 +120,7 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           aspect-ratio: 1 / 1;
           overflow: hidden;
           display: block;
+          border: 1px solid var(--color-border);
         }
 
         .ugc-media {
@@ -139,14 +140,14 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           align-items: center;
           justify-content: center;
           gap: 10px;
-          color: var(--color-bg);
+          color: var(--color-white);
           background: rgba(201, 169, 110, 0);
           opacity: 0;
           transition: opacity 200ms ease-out, background 200ms ease-out;
         }
         .ugc-cell:hover .ugc-hover {
           opacity: 1;
-          background: rgba(201, 169, 110, 0.85);
+          background: rgba(201, 169, 110, 0.88);
         }
         .ugc-hover-label {
           font-family: var(--font-body);
@@ -165,28 +166,36 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           font-family: var(--font-body);
           font-weight: 300;
           font-size: 12px;
-          color: var(--color-cream);
+          color: var(--color-text);
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          border: 1px solid var(--color-gold);
+          border: 1px solid var(--color-accent);
           background: transparent;
           padding: 14px 36px;
           text-decoration: none;
-          transition: background 300ms ease-out;
+          transition: background 300ms ease-out, color 300ms ease-out;
         }
         .ugc-follow-btn:hover {
-          background: rgba(201, 169, 110, 0.08);
+          background: var(--color-accent);
+          color: var(--color-white);
         }
 
         @media (max-width: 767px) {
-          .ugc-grid { grid-template-columns: repeat(2, 1fr); }
+          .ugc-gallery { padding: 64px 12px; }
+          .ugc-header { margin-bottom: 32px; }
+          .ugc-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
           .ugc-title { font-size: 30px; }
+          .ugc-subhead { font-size: 12px; letter-spacing: 0.16em; }
+          .ugc-follow { margin-top: 36px; }
+          .ugc-follow-btn { width: 100%; max-width: 320px; text-align: center; padding: 16px 24px; }
         }
       `}</style>
 
       <header className="ugc-header">
         <h2 className="ugc-title">As Seen On Our Clients</h2>
-        <p className="ugc-subhead">Tag #kassythreads to be featured</p>
+        <p className="ugc-subhead">
+          Tag {INSTAGRAM_HANDLE} for a chance to be featured
+        </p>
       </header>
 
       <div className="ugc-grid">
