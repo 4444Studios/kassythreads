@@ -327,7 +327,7 @@ export const demoTestimonials: DemoTestimonial[] = [
   {
     id: "t4",
     quote:
-      "Amazing as always. I don't even trust myself with my brows as much as I trust Kassey. She has a gift.",
+      "Amazing as always. I don't even trust myself with my brows as much as I trust Kassy. She has a gift.",
     author: "Tara",
     location: "Brow Tinting",
   },

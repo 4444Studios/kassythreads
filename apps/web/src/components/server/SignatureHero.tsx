@@ -189,7 +189,7 @@ export default function SignatureHero() {
         </p>
         <h1 className="sig-hero-headline">Brows you&apos;ll obsess over.</h1>
         <p className="sig-hero-subhead">
-          Expert threading, brow lamination &amp; lash lifts — by Kassey.
+          Expert threading, brow lamination &amp; lash lifts — by Kassy.
           Because when your brows are right, everything feels right.
         </p>
         <div className="sig-hero-actions">
