@@ -1,11 +1,3 @@
-// Pure React Server Component — no 'use client'.
-// 3-panel section directly below the hero. Each panel is a seamless short
-// MP4 loop (treated like a GIF) stored in MinIO at content/service-{slug}.mp4.
-// Data is fetched from the API at build time and revalidated hourly (ISR).
-//
-// VIDEO SPEC (panels): H.264, CRF 28, square-ish 1:1 or 4:5, target under 4MB
-// Compress with Handbrake before uploading to MinIO.
-
 import { isDemoMode, demoFeaturedServices } from "@/lib/demo";
 
 type FeaturedService = {
@@ -13,7 +5,6 @@ type FeaturedService = {
   name: string;
   slug: string;
   description?: string;
-  // Optional explicit media (used by demo data / static fallback).
   imageUrl?: string;
   videoUrl?: string;
 };
@@ -30,17 +21,14 @@ async function getFeaturedServices(): Promise<FeaturedService[]> {
         if (services.length > 0) return services;
       }
     } catch {
-      // fall through to demo / empty
+      // fall through
     }
   }
-  // Demo fallback for client previews (NEXT_PUBLIC_DEMO_MODE=1).
   if (isDemoMode()) return demoFeaturedServices;
   return [];
 }
 
 function GifPanel({ service }: { service: FeaturedService }) {
-  // Prefer an explicit video, then a MinIO video (when configured), else fall
-  // back to a still image (demo / no-video services).
   const minio = process.env.NEXT_PUBLIC_MINIO_URL;
   const videoUrl =
     service.videoUrl ??
@@ -58,23 +46,19 @@ function GifPanel({ service }: { service: FeaturedService }) {
           playsInline
           preload="metadata"
           poster={service.imageUrl}
-          className="gif-panel-video"
+          className="gif-panel-media"
         >
           <source src={videoUrl} type="video/mp4" />
         </video>
       ) : service.imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={service.imageUrl}
-          alt={service.name}
-          className="gif-panel-video"
-        />
+        <img src={service.imageUrl} alt={service.name} className="gif-panel-media" />
       ) : null}
 
       <div className="gif-panel-overlay">
         <h3 className="gif-panel-name">{service.name}</h3>
         <a className="gif-panel-cta" href={`/services/${service.slug}`}>
-          Explore Service
+          Learn More →
         </a>
       </div>
     </article>
@@ -83,43 +67,38 @@ function GifPanel({ service }: { service: FeaturedService }) {
 
 export default async function GifProductSection() {
   const services = await getFeaturedServices();
-
-  // Nothing to show (e.g. API down at build time) — render nothing rather than
-  // an empty shell.
   if (services.length === 0) return null;
 
   return (
-    <section className="gif-product-section">
+    <section className="gif-section">
       <style>{`
-        .gif-product-section {
-          background: var(--color-surface);
+        .gif-section {
+          background: var(--color-text);
           padding: 0;
         }
 
-        .gif-product-grid {
+        .gif-strip {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 0;
         }
 
         .gif-panel {
           position: relative;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 3 / 4;
           overflow: hidden;
-          border: 1px solid transparent;
-          transition: border-color 180ms ease-out;
-        }
-        .gif-panel:hover {
-          border-color: var(--color-gold);
         }
 
-        .gif-panel-video {
+        .gif-panel-media {
           position: absolute;
           inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
           z-index: 0;
+          transition: transform 600ms var(--ease-luxury);
+        }
+        .gif-panel:hover .gif-panel-media {
+          transform: scale(1.04);
         }
 
         .gif-panel-overlay {
@@ -128,58 +107,74 @@ export default async function GifProductSection() {
           z-index: 1;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
           justify-content: flex-end;
-          gap: 14px;
-          padding: 0 24px 48px;
-          text-align: center;
-          background: rgba(10, 10, 8, 0.45);
-          transition: background 180ms ease-out;
-        }
-        .gif-panel:hover .gif-panel-overlay {
-          background: rgba(10, 10, 8, 0.3);
+          padding: 28px 24px 32px;
+          background: linear-gradient(
+            to top,
+            rgba(10, 10, 10, 0.85) 0%,
+            rgba(10, 10, 10, 0.2) 55%,
+            transparent 100%
+          );
         }
 
         .gif-panel-name {
           margin: 0;
-          font-family: var(--font-display);
+          font-family: var(--font-impact);
           font-weight: 400;
-          font-size: 28px;
-          color: var(--color-cream);
-          letter-spacing: 0.04em;
+          font-size: clamp(22px, 2.4vw, 32px);
+          line-height: 1;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          color: var(--color-white);
         }
 
         .gif-panel-cta {
+          margin-top: 10px;
           font-family: var(--font-body);
-          font-weight: 300;
-          font-size: 12px;
-          color: var(--color-gold);
-          letter-spacing: 0.2em;
+          font-weight: 400;
+          font-size: 11px;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
+          color: var(--color-accent);
           text-decoration: none;
+          border-bottom: 1px solid rgba(201, 169, 110, 0.4);
+          padding-bottom: 2px;
+          transition: border-color 200ms ease-out, color 200ms ease-out;
         }
         .gif-panel-cta:hover {
-          text-decoration: underline;
+          color: var(--color-white);
+          border-color: var(--color-white);
         }
 
-        @media (max-width: 767px) {
-          .gif-product-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .gif-panel { aspect-ratio: 3 / 4; border-color: var(--color-border); }
-          .gif-panel-overlay { padding: 0 12px 24px; gap: 8px; background: rgba(10, 10, 8, 0.42); }
-          .gif-panel-name { font-size: 18px; }
-          .gif-panel-cta { font-size: 10px; letter-spacing: 0.15em; }
+        /* Dividers between panels */
+        .gif-panel + .gif-panel {
+          border-left: 1px solid rgba(255, 255, 255, 0.08);
         }
-        @media (max-width: 420px) {
-          .gif-product-grid { grid-template-columns: 1fr; }
+
+        /* ── Tablet ── */
+        @media (max-width: 768px) {
+          .gif-strip {
+            grid-template-columns: repeat(3, 1fr);
+          }
+          .gif-panel { aspect-ratio: 2 / 3; }
+          .gif-panel-overlay { padding: 16px 14px 20px; }
+          .gif-panel-name { font-size: clamp(16px, 3.5vw, 24px); }
+          .gif-panel-cta { font-size: 9px; letter-spacing: 0.12em; }
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 500px) {
+          .gif-strip { grid-template-columns: 1fr; }
           .gif-panel { aspect-ratio: 4 / 3; }
-          .gif-panel-overlay { padding: 0 20px 28px; }
-          .gif-panel-name { font-size: 22px; }
+          .gif-panel + .gif-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+          .gif-panel-overlay { padding: 20px 20px 24px; }
+          .gif-panel-name { font-size: 28px; }
+          .gif-panel-cta { font-size: 11px; }
         }
       `}</style>
 
-      <div className="gif-product-grid">
+      <div className="gif-strip">
         {services.map((service) => (
           <GifPanel key={service.id} service={service} />
         ))}

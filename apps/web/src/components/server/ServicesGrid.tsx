@@ -80,20 +80,21 @@ export default async function ServicesGrid() {
           margin-bottom: 56px;
         }
         .services-eyebrow {
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-accent-dark);
+          color: var(--color-accent);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
         .services-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 44px;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(44px, 6vw, 72px);
+          line-height: 0.95;
           color: var(--color-text);
-          letter-spacing: 0.1em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
         }
         .services-groups {
@@ -167,17 +168,23 @@ export default async function ServicesGrid() {
         @media (max-width: 767px) {
           .services-grid { padding: 64px 20px; }
           .services-head { margin-bottom: 36px; }
-          .services-title { font-size: 30px; }
+          .services-title { font-size: 52px; }
           .services-groups { gap: 36px; }
-          .service-row { padding: 18px 0; gap: 16px; }
-          .service-name { font-size: 20px; }
-          .service-desc { font-size: 12.5px; margin-top: 5px; }
-          .service-price { font-size: 15px; }
+          .service-row { padding: 16px 0; gap: 16px; }
+          .service-name { font-size: 19px; }
+          .service-desc { font-size: 12px; margin-top: 4px; }
+          .service-price { font-size: 14px; }
+          .service-book { font-size: 10px; }
+        }
+        @media (max-width: 420px) {
+          .services-grid { padding: 52px 16px; }
+          .services-title { font-size: 44px; }
+          .service-name { font-size: 17px; }
         }
       `}</style>
 
       <header className="services-head">
-        <p className="services-eyebrow">Studio Menu</p>
+        <p className="services-eyebrow">What We Do</p>
         <h2 className="services-title">Services &amp; Pricing</h2>
       </header>
 

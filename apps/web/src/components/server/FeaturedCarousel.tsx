@@ -81,19 +81,20 @@ export default async function FeaturedCarousel() {
           margin-bottom: 40px;
         }
         .feat-eyebrow {
-          margin: 0 0 12px;
+          margin: 0 0 10px;
           font-family: var(--font-mono);
           font-size: 11px;
           letter-spacing: 0.32em;
           text-transform: uppercase;
-          color: var(--color-accent-dark);
+          color: var(--color-accent);
         }
         .feat-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 40px;
-          letter-spacing: 0.08em;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(44px, 5.5vw, 68px);
+          line-height: 0.95;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
           color: var(--color-text);
         }
@@ -161,14 +162,14 @@ export default async function FeaturedCarousel() {
         .feat-card-cta:hover { text-decoration: underline; }
         @media (max-width: 767px) {
           .feat-carousel { padding: 56px 16px 64px; }
-          .feat-title { font-size: 28px; }
+          .feat-title { font-size: 52px; }
           .feat-head { margin-bottom: 28px; }
-          .feat-card-name { font-size: 13px; }
+          .feat-card-name { font-size: 12px; }
           .feat-card-price { font-size: 14px; }
         }
         @media (max-width: 420px) {
           .feat-carousel { padding: 48px 12px 56px; }
-          .feat-title { font-size: 24px; }
+          .feat-title { font-size: 44px; }
         }
       `}</style>
 

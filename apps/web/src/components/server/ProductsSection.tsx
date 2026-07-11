@@ -56,20 +56,21 @@ export default async function ProductsSection() {
           margin-bottom: 48px;
         }
         .products-eyebrow {
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-accent-dark);
+          color: var(--color-accent);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
         .products-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 44px;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(48px, 6vw, 72px);
+          line-height: 0.95;
           color: var(--color-text);
-          letter-spacing: 0.1em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
         }
         .products-subhead {
@@ -199,10 +200,10 @@ export default async function ProductsSection() {
       `}</style>
 
       <header className="products-head">
-        <p className="products-eyebrow">Shop the Studio</p>
-        <h2 className="products-title">Take the Experience Home</h2>
+        <p className="products-eyebrow">Take the Glow Home</p>
+        <h2 className="products-title">Studio Favorites</h2>
         <p className="products-subhead">
-          Retail favorites curated for your at-home brow ritual.
+          Curated picks for your at-home brow ritual — drops coming soon.
         </p>
       </header>
 

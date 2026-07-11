@@ -15,20 +15,21 @@ export default function BeforeAfterSection() {
         }
         .ba-head { text-align: center; margin-bottom: 48px; }
         .ba-eyebrow {
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-accent-dark);
+          color: var(--color-accent);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
         .ba-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 44px;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(48px, 6vw, 72px);
+          line-height: 0.95;
           color: var(--color-text);
-          letter-spacing: 0.1em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
         }
         .ba-frame {
@@ -68,7 +69,7 @@ export default function BeforeAfterSection() {
       `}</style>
 
       <header className="ba-head">
-        <p className="ba-eyebrow">The Difference</p>
+        <p className="ba-eyebrow">The Kassey Difference</p>
         <h2 className="ba-title">Before &amp; After</h2>
       </header>
 

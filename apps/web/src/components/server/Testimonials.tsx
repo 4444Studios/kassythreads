@@ -21,20 +21,21 @@ export default function Testimonials() {
           margin-bottom: 48px;
         }
         .testimonials-eyebrow {
-          margin: 0 0 14px;
+          margin: 0 0 10px;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--color-accent-dark);
+          color: var(--color-accent);
           letter-spacing: 0.35em;
           text-transform: uppercase;
         }
         .testimonials-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 44px;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(48px, 6vw, 72px);
+          line-height: 0.95;
           color: var(--color-text);
-          letter-spacing: 0.1em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
         }
         .testimonials-rating {
@@ -83,15 +84,20 @@ export default function Testimonials() {
         @media (max-width: 767px) {
           .testimonials { padding: 64px 20px; }
           .testimonials-head { margin-bottom: 36px; }
-          .testimonials-title { font-size: 30px; }
-          .testimonial-quote { font-size: 21px; line-height: 1.45; }
+          .testimonials-title { font-size: 52px; }
+          .testimonial-quote { font-size: 20px; line-height: 1.45; }
           .testimonial-card { padding: 0; }
+        }
+        @media (max-width: 420px) {
+          .testimonials { padding: 52px 16px; }
+          .testimonials-title { font-size: 44px; }
+          .testimonial-quote { font-size: 18px; }
         }
       `}</style>
 
       <header className="testimonials-head">
-        <p className="testimonials-eyebrow">Kind Words</p>
-        <h2 className="testimonials-title">Loved by Our Clients</h2>
+        <p className="testimonials-eyebrow">They Said It Best</p>
+        <h2 className="testimonials-title">What Clients Are Saying</h2>
         <p className="testimonials-rating">
           {STUDIO.booksyRating} ★ · {STUDIO.booksyReviewCount} Reviews on{" "}
           <a href={STUDIO.booksyUrl} target="_blank" rel="noopener noreferrer">

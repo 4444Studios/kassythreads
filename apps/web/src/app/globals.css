@@ -1,36 +1,31 @@
 @import "tailwindcss";
 
-/*
-  KassyThreads design system — bright editorial (Posh Brows–inspired).
-  Palette + typography + motion tokens are exposed through Tailwind v4's @theme
-  so they become first-class utilities. Do not hardcode hex values in className
-  strings — reference these tokens instead.
-*/
 @theme {
-  /* Palette — light, inviting, warm beige accents */
+  /* Palette — bright, clean, Kassy's signature warmth in a single gold accent */
   --color-bg: #ffffff;
-  --color-surface: #f7f4ef;
+  --color-surface: #f6f6f6;
   --color-surface-elevated: #fafafa;
-  --color-border: #e8e4dc;
-  --color-text: #1a1a18;
-  --color-muted: #6b6560;
+  --color-border: #e2e2e2;
+  --color-text: #111111;
+  --color-muted: #777777;
   --color-accent: #c9a96e;
   --color-accent-dark: #8a7050;
   --color-white: #ffffff;
 
-  /* Aliases — gold/cream kept for gradual migration & CTA continuity */
+  /* Aliases kept for backward compat */
   --color-gold: #c9a96e;
   --color-gold-muted: #8a7050;
-  --color-cream: #1a1a18;
+  --color-cream: #111111;
 
-  /* Typography — backed by next/font CSS variables from the root layout */
+  /* Typography */
+  --font-impact: var(--font-bebas), "Bebas Neue", "Arial Black", sans-serif;
   --font-display: var(--font-cormorant), "Cormorant Garamond", serif;
   --font-body: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
   --font-mono: var(--font-dm-mono), "DM Mono", ui-monospace, monospace;
 
-  /* Motion signature — unhurried, expensive */
+  /* Motion */
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-luxury: 850ms;
+  --duration-luxury: 700ms;
 }
 
 :root {
@@ -52,7 +47,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Respect users who prefer reduced motion across the whole site. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

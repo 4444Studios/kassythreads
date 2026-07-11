@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ANNOUNCEMENT, STUDIO } from "@/lib/studio";
+import { STUDIO } from "@/lib/studio";
 
 const NAV_LINKS = [
   { href: "#services", label: "Services" },
   { href: "#shop", label: "Shop" },
-  { href: "/book", label: "Book" },
+  { href: STUDIO.booksyUrl, label: "Book", external: true },
   { href: "#contact", label: "Contact" },
 ] as const;
+
+const MARQUEE_TEXT =
+  `${STUDIO.booksyRating} ★ · ${STUDIO.booksyReviewCount} Reviews · Eyebrow Threading · Brow Lamination · Lash Lift · El Monte, CA · `;
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -16,29 +19,45 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <style>{`
+        /* ── Announcement bar — scrolling marquee ── */
+        .site-announce {
+          background: var(--color-text);
+          color: var(--color-white);
+          overflow: hidden;
+          white-space: nowrap;
+          padding: 9px 0;
+        }
+        @keyframes announce-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .site-announce-inner {
+          display: inline-block;
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          animation: announce-scroll 28s linear infinite;
+          will-change: transform;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .site-announce-inner { animation: none; }
+        }
+
+        /* ── Brand bar ── */
         .site-header {
           position: sticky;
           top: 0;
           z-index: 50;
           background: var(--color-bg);
-        }
-        .site-announce {
-          background: var(--color-surface);
-          text-align: center;
-          padding: 10px 16px;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--color-text);
+          border-bottom: 1px solid var(--color-border);
         }
         .site-brand-bar {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
           gap: 16px;
-          padding: 18px 28px;
-          border-bottom: 1px solid var(--color-border);
+          padding: 16px 28px;
           background: var(--color-bg);
         }
         .site-brand-left {
@@ -50,15 +69,15 @@ export function SiteHeader() {
           display: none;
           background: none;
           border: none;
-          padding: 8px;
+          padding: 6px;
           cursor: pointer;
           color: var(--color-text);
         }
         .site-wordmark {
-          font-family: var(--font-body);
+          font-family: var(--font-impact);
           font-weight: 400;
-          font-size: 18px;
-          letter-spacing: 0.28em;
+          font-size: 22px;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--color-text);
           text-decoration: none;
@@ -72,7 +91,7 @@ export function SiteHeader() {
         }
         .site-ig {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           color: var(--color-muted);
@@ -81,71 +100,93 @@ export function SiteHeader() {
         .site-ig:hover { color: var(--color-text); }
         .site-book-btn {
           font-family: var(--font-body);
-          font-weight: 300;
+          font-weight: 500;
+          font-size: 11px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--color-white);
+          background: var(--color-text);
+          border: 1px solid var(--color-text);
+          padding: 10px 20px;
+          text-decoration: none;
+          transition: background 200ms ease-out, border-color 200ms ease-out;
+          white-space: nowrap;
+        }
+        .site-book-btn:hover {
+          background: var(--color-accent);
+          border-color: var(--color-accent);
+        }
+
+        /* ── Desktop nav ── */
+        .site-nav {
+          display: flex;
+          justify-content: center;
+          gap: 36px;
+          padding: 11px 24px;
+          border-top: 1px solid var(--color-border);
+          background: var(--color-bg);
+        }
+        .site-nav a {
+          font-family: var(--font-body);
+          font-weight: 400;
           font-size: 11px;
           letter-spacing: 0.22em;
           text-transform: uppercase;
           color: var(--color-text);
-          border: 1px solid var(--color-accent);
-          background: transparent;
-          padding: 10px 20px;
           text-decoration: none;
-          transition: background 200ms ease-out, color 200ms ease-out;
+          transition: color 150ms ease-out;
         }
-        .site-book-btn:hover {
-          background: var(--color-accent);
-          color: var(--color-white);
-        }
-        .site-nav {
-          background: var(--color-surface);
-          display: flex;
-          justify-content: center;
-          gap: 36px;
-          padding: 12px 24px;
-        }
-        .site-nav a {
-          font-family: var(--font-body);
-          font-weight: 300;
-          font-size: 12px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: var(--color-text);
-          text-decoration: none;
-        }
-        .site-nav a:hover { color: var(--color-accent-dark); }
+        .site-nav a:hover { color: var(--color-accent); }
+
+        /* ── Mobile nav drawer ── */
         .site-mobile-nav {
           display: none;
           flex-direction: column;
-          gap: 0;
           background: var(--color-bg);
-          border-bottom: 1px solid var(--color-border);
         }
         .site-mobile-nav a {
           font-family: var(--font-body);
-          font-size: 13px;
-          letter-spacing: 0.2em;
+          font-weight: 400;
+          font-size: 14px;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
           color: var(--color-text);
           text-decoration: none;
-          padding: 16px 24px;
+          padding: 18px 24px;
           border-bottom: 1px solid var(--color-border);
+          transition: color 150ms ease-out, background 150ms ease-out;
+        }
+        .site-mobile-nav a:hover {
+          color: var(--color-accent);
+          background: var(--color-surface);
         }
         .site-mobile-nav.is-open { display: flex; }
+
+        /* ── Responsive ── */
         @media (max-width: 767px) {
           .site-brand-bar {
             grid-template-columns: auto 1fr auto;
             padding: 14px 16px;
+            gap: 8px;
           }
           .site-menu-btn { display: inline-flex; }
-          .site-wordmark { font-size: 14px; letter-spacing: 0.18em; }
+          .site-wordmark { font-size: 18px; letter-spacing: 0.1em; text-align: left; }
           .site-ig { display: none; }
-          .site-book-btn { padding: 8px 14px; font-size: 10px; }
+          .site-book-btn { padding: 9px 14px; font-size: 10px; }
           .site-nav { display: none; }
-          .site-announce { font-size: 10px; letter-spacing: 0.12em; padding: 8px 12px; }
+          .site-announce-inner { font-size: 9px; letter-spacing: 0.16em; }
+        }
+        @media (max-width: 380px) {
+          .site-wordmark { font-size: 16px; }
+          .site-book-btn { padding: 8px 12px; }
         }
       `}</style>
 
-      <div className="site-announce">{ANNOUNCEMENT}</div>
+      <div className="site-announce" aria-label="Studio announcement">
+        <span className="site-announce-inner" aria-hidden="true">
+          {MARQUEE_TEXT}{MARQUEE_TEXT}
+        </span>
+      </div>
 
       <div className="site-brand-bar">
         <div className="site-brand-left">
@@ -156,9 +197,15 @@ export function SiteHeader() {
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
-            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
-              <path d="M1 1h20M1 8h20M1 15h20" stroke="currentColor" strokeWidth="1.4" />
-            </svg>
+            {open ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M2 2l16 16M18 2L2 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+                <path d="M1 1h20M1 8h20M1 15h20" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+            )}
           </button>
         </div>
 
@@ -175,7 +222,12 @@ export function SiteHeader() {
           >
             {STUDIO.instagramHandle}
           </a>
-          <a className="site-book-btn" href="/book">
+          <a
+            className="site-book-btn"
+            href={STUDIO.booksyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Book Now
           </a>
         </div>
@@ -183,7 +235,13 @@ export function SiteHeader() {
 
       <nav className="site-nav" aria-label="Primary">
         {NAV_LINKS.map((link) => (
-          <a key={link.href} href={link.href}>
+          <a
+            key={link.href}
+            href={link.href}
+            {...("external" in link && link.external
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+          >
             {link.label}
           </a>
         ))}
@@ -194,7 +252,14 @@ export function SiteHeader() {
         aria-label="Mobile"
       >
         {NAV_LINKS.map((link) => (
-          <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+          <a
+            key={link.href}
+            href={link.href}
+            onClick={() => setOpen(false)}
+            {...("external" in link && link.external
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+          >
             {link.label}
           </a>
         ))}

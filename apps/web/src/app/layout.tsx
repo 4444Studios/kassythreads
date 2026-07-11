@@ -1,8 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, DM_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 
-// Display — Cormorant Garamond, weights 300–400, tracked wide for labels/headlines.
+// Impact display — Bebas Neue, condensed bold for hero headlines and section titles.
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+// Italic accent — Cormorant Garamond, for taglines, quotes, subtle elegance.
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400"],
@@ -10,10 +18,10 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-// Body — DM Sans, weights 300–400, generous line-height.
+// Body — DM Sans, weights 300–500, generous line-height.
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "500"],
   variable: "--font-dm-sans",
   display: "swap",
 });
@@ -47,7 +55,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
+      className={`${bebasNeue.variable} ${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
       <body>{children}</body>
     </html>

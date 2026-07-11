@@ -90,11 +90,12 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
         }
         .ugc-title {
           margin: 0;
-          font-family: var(--font-display);
-          font-weight: 300;
-          font-size: 40px;
+          font-family: var(--font-impact);
+          font-weight: 400;
+          font-size: clamp(44px, 5.5vw, 68px);
+          line-height: 0.95;
           color: var(--color-text);
-          letter-spacing: 0.12em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
         }
         .ugc-subhead {
@@ -184,10 +185,15 @@ export function UGCGallery({ posts }: { posts: InstagramPost[] }) {
           .ugc-gallery { padding: 64px 12px; }
           .ugc-header { margin-bottom: 32px; }
           .ugc-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-          .ugc-title { font-size: 30px; }
-          .ugc-subhead { font-size: 12px; letter-spacing: 0.16em; }
+          .ugc-title { font-size: 52px; }
+          .ugc-subhead { font-size: 11px; letter-spacing: 0.16em; }
           .ugc-follow { margin-top: 36px; }
           .ugc-follow-btn { width: 100%; max-width: 320px; text-align: center; padding: 16px 24px; }
+        }
+        @media (max-width: 420px) {
+          .ugc-gallery { padding: 52px 10px; }
+          .ugc-title { font-size: 44px; }
+          .ugc-grid { gap: 4px; }
         }
       `}</style>
 
