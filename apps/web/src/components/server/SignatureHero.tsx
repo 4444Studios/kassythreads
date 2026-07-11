@@ -228,7 +228,7 @@ export default function SignatureHero() {
         </h1>
 
         <p className="sig-hero-tagline">
-          Precision threading, brow lamination &amp; lash lifts — by Kassey.
+          Precision threading, brow lamination &amp; lash lifts — by Kassy.
           Because when your brows are right, everything feels right.
         </p>
 

@@ -69,7 +69,7 @@ export default function BeforeAfterSection() {
       `}</style>
 
       <header className="ba-head">
-        <p className="ba-eyebrow">The Kassey Difference</p>
+        <p className="ba-eyebrow">The Kassy Difference</p>
         <h2 className="ba-title">Before &amp; After</h2>
       </header>
 
